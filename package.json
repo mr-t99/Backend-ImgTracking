@@ -1,0 +1,23 @@
+{
+  "name": "backend-imgtracking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "Tranthang",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "formidable": "^1.2.2",
+    "fs": "0.0.1-security",
+    "glob": "^7.1.6",
+    "inkjet": "^2.1.2",
+    "nodemon": "^2.0.4",
+    "path": "^0.12.7",
+    "pngjs": "^5.0.0",
+    "readline-sync": "^1.4.10"
+  }
+}
