@@ -1,0 +1,9 @@
+upload method: post
+    uploadvideo: localhost:3000/upload/video
+    uploadImage: localhost:3000/upload/image
+getconten method: get
+    get link dowload nft file: localhost:3000/getcontent/linknft/:name
+    get image: localhost:3000/getcontent/image/:name
+    get video on server: localhost:3000/getcontent/video/:name
+    get all image asset on server: NUll
+    get all image asset on server: NULL

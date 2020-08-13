@@ -25,15 +25,14 @@ function uploadVideo(req, res){
     form.uploadDir = "./upload/videos/";
     //xử lý upload
     form.parse(req, function (err, fields, file) {
-        console.log(file)
-        //path tmp trên server
-        // var path = file.files.path;
-        // //thiết lập path mới cho file
-        // var newpath = form.uploadDir + file.files.name;
-        // fs.rename(path, newpath, function (err) {
-        //     if (err) throw err;
-        //     res.end('Upload Thanh cong!');
-        // });
+        // path tmp trên server
+        var path = file.files.path;
+        //thiết lập path mới cho file
+        var newpath = form.uploadDir + file.files.name;
+        fs.rename(path, newpath, function (err) {
+            if (err) throw err;
+            res.end('Upload Thanh cong!');
+        });
         // creatNFT(newpath);
     });
 }

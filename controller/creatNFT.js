@@ -335,8 +335,8 @@ function test(pathImg) {
             buffer = fs.readFileSync(srcImage);
         }
 
-        if (!fs.existsSync(path.join(__dirname, '../upload/NTFfile'))) {
-            fs.mkdirSync(path.join(__dirname, '../upload/NTFfile'));
+        if (!fs.existsSync(path.join(__dirname, '../upload/nftfile'))) {
+            fs.mkdirSync(path.join(__dirname, '../upload/nftfile'));
         }
 
         if (extName.toLowerCase() == ".jpg" || extName.toLowerCase() == ".jpeg") {
@@ -386,9 +386,9 @@ function test(pathImg) {
         let contentFset = Module.FS.readFile(filenameFset);
         let contentFset3 = Module.FS.readFile(filenameFset3);
 
-        fs.writeFileSync(path.join(__dirname, '../upload/NTFfile/') + fileName + ext, content);
-        fs.writeFileSync(path.join(__dirname, '../upload/NTFfile/') + fileName + ext2, contentFset);
-        fs.writeFileSync(path.join(__dirname, '../upload/NTFfile/') + fileName + ext3, contentFset3);
+        fs.writeFileSync(path.join(__dirname, '../upload/nftfile/') + fileName + ext, content);
+        fs.writeFileSync(path.join(__dirname, '../upload/nftfile/') + fileName + ext2, contentFset);
+        fs.writeFileSync(path.join(__dirname, '../upload/nftfile/') + fileName + ext3, contentFset3);
     }
     a();
 }
