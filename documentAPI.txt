@@ -5,5 +5,8 @@ getconten method: get
     get link dowload nft file: localhost:3000/getcontent/linknft/:name
     get image: localhost:3000/getcontent/image/:name
     get video on server: localhost:3000/getcontent/video/:name
-    get all image asset on server: NUll
-    get all image asset on server: NULL
+    get all video asset on server: http://localhost:3000/getcontent/videoasset
+    get all image asset on server: http://localhost:3000/getcontent/imgasset
+toa database
+video table: CREATE TABLE `ar_database`.`videos` ( `id` INT NOT NULL AUTO_INCREMENT , `n_video` TEXT NOT NULL , `l_video` TEXT NOT NULL , PRIMARY KEY (`id`), UNIQUE (`n_video`), UNIQUE (`l_video`)) ENGINE = InnoDB;
+image table: CREATE TABLE `ar_database`.`image` ( `id` INT NOT NULL AUTO_INCREMENT , `n_image` TEXT NOT NULL , `l_image` TEXT NOT NULL , `l_lft` TEXT NOT NULL , PRIMARY KEY (`id`), UNIQUE (`n_image`(150)), UNIQUE (`l_lft`)) ENGINE = InnoDB;

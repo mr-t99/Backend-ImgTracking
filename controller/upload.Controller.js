@@ -1,40 +1,74 @@
 const formidable = require('formidable');
 const fs = require('fs');
 const creatNFT = require('./creatNFT');
+const db = require('../database/db');
+const cn = db.createConnection();
+const DOMAIN = process.env.FIRA_DB_PSW || 'localhost:3000';
 
-function uploadImg(req, res){
+async function uploadImg(req, res) {
     var form = new formidable.IncomingForm();
     //Thiết lập thư mục chứa file trên server
     form.uploadDir = "./upload/image/";
     //xử lý upload
-    form.parse(req, function (err, fields, file) {
-        //path tmp trên server
-        var path = file.files.path;
-        //thiết lập path mới cho file
-        var newpath = form.uploadDir + file.files.name;
-        fs.rename(path, newpath, function (err) {
-            if (err) throw err;
-            res.end('Upload Thanh cong!');
+    const object = await new Promise(tv => {
+        form.parse(req, function (err, fields, file) {
+            //path tmp trên server
+            var path = file.files.path;
+            //thiết lập path mới cho file
+            var newpath = form.uploadDir + file.files.name;
+            var nameNft = file.files.name.split('.')[0];
+            fs.rename(path, newpath, function (err) {
+                if (err) return res.send({
+                    message:err
+                });
+            });
+            creatNFT(newpath);
+            var object = {
+                n_image: file.files.name,
+                l_image: `${DOMAIN}/getcontent/image/${file.files.name}`,
+                l_nft: `${DOMAIN}/getcontent/linknft/${nameNft}`
+            };
+            tv(object);
         });
-        creatNFT(newpath);
-    });
+    })
+    const sql = `INSERT INTO image (id, n_image, l_image, l_nft) VALUES (NULL, '${object.n_image}', '${object.l_image}', '${object.l_nft}')`;
+    cn.query(sql, (err)=>{
+        if(err) return res.status(400).send(err);
+        res.status(200).send({
+            message:"Data saving is complete"
+        })
+    })
 }
 
-function uploadVideo(req, res){
+async function uploadVideo(req, res) {
     var form = new formidable.IncomingForm();
     form.uploadDir = "./upload/videos/";
     //xử lý upload
-    form.parse(req, function (err, fields, file) {
-        // path tmp trên server
-        var path = file.files.path;
-        //thiết lập path mới cho file
-        var newpath = form.uploadDir + file.files.name;
-        fs.rename(path, newpath, function (err) {
-            if (err) throw err;
-            res.end('Upload Thanh cong!');
+    const object = await new Promise(tv=>{
+        form.parse(req, function (err, fields, file) {
+            // path tmp trên server
+            var path = file.files.path;
+            //thiết lập path mới cho file
+            var newpath = form.uploadDir + file.files.name;
+            fs.rename(path, newpath, function (err) {
+                if (err) return res.send({
+                    message:err
+                });
+            });
+            var object = {
+                n_video: file.files.name,
+                l_video: `${DOMAIN}/getcontent/video/${file.files.name}`
+            };
+            tv(object);
         });
-        // creatNFT(newpath);
     });
+    const sql = `INSERT INTO videos (id, n_video, l_video) VALUES (NULL, '${object.n_video}', '${object.l_video}')`;
+    cn.query(sql, (err)=>{
+        if(err) return res.status(400).send(err);
+        res.status(200).send({
+            message:"Data saving is complete"
+        })
+    })
 }
 
 module.exports = {

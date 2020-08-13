@@ -311,7 +311,6 @@ function test(pathImg) {
     srcImage = pathImg;
     // console.log(path.join(__dirname,'../upload/NTFfile'));
     const a = Module.onRuntimeInitialized = () => {
-        console.log(srcImage);
         let fileNameWithExt = path.basename(srcImage);
         let fileName = path.parse(fileNameWithExt).name;
         let extName = path.parse(fileNameWithExt).ext;
