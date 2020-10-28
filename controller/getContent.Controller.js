@@ -6,13 +6,7 @@ const domain = 'http://localhost:3000'
 
 function getImage(req, res) {
     const nameImg = req.params.name;
-    const pathImg = "./upload/image/" + nameImg;
-    fs.readFile(pathImg, (err, dataImg) => {
-        // console.log(err);
-        if (err) return res.status(404).send(err);
-        res.writeHead(200, { 'Content-Type': 'image/jpeg' })
-        res.end(dataImg);
-    })
+    res.sendFile(path.resolve(`./upload/image/${nameImg}`),{ 'Content-Type': 'image/jpeg' });
 }
 
 function getImgAsset(req, res){
