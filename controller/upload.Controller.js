@@ -3,7 +3,7 @@ const fs = require('fs');
 const creatNFT = require('./creatNFT');
 const db = require('../database/db');
 const cn = db.createConnection();
-const DOMAIN = process.env.FIRA_DB_PSW || 'localhost:3000';
+const DOMAIN = process.env.FIRA_DB_PSW || 'localhost:4000';
 
 async function uploadImg(req, res) {
     var form = new formidable.IncomingForm();
@@ -13,10 +13,11 @@ async function uploadImg(req, res) {
     const object = await new Promise(tv => {
         form.parse(req, function (err, fields, file) {
             //path tmp trên server
-            var path = file.files.path;
+            var path = file[''].path;
             //thiết lập path mới cho file
-            var newpath = form.uploadDir + file.files.name;
-            var nameNft = file.files.name.split('.')[0];
+            var newpath = form.uploadDir + file[''].name;
+            var nameNft = file[''].name.split('.')[0];
+
             fs.rename(path, newpath, function (err) {
                 if (err) return res.send({
                     message:err
@@ -24,20 +25,23 @@ async function uploadImg(req, res) {
             });
             creatNFT(newpath);
             var object = {
-                n_image: file.files.name,
-                l_image: `${DOMAIN}/getcontent/image/${file.files.name}`,
-                l_nft: `${DOMAIN}/getcontent/linknft/${nameNft}`
+                n_image: file[''].name,
+                l_image: `${DOMAIN}/image/${file[''].name}`,
+                l_nft: `${DOMAIN}/nft/${nameNft}`
             };
             tv(object);
         });
     })
-    const sql = `INSERT INTO image (id, n_image, l_image, l_nft) VALUES (NULL, '${object.n_image}', '${object.l_image}', '${object.l_nft}')`;
-    cn.query(sql, (err)=>{
-        if(err) return res.status(400).send(err);
-        res.status(200).send({
-            message:"Data saving is complete"
-        })
-    })
+    res.send({
+        object
+    });
+    // const sql = `INSERT INTO image (id, n_image, l_image, l_nft) VALUES (NULL, '${object.n_image}', '${object.l_image}', '${object.l_nft}')`;
+    // cn.query(sql, (err)=>{
+    //     if(err) return res.status(400).send(err);
+    //     res.status(200).send({
+    //         message:"Data saving is complete"
+    //     })
+    // })
 }
 
 async function uploadVideo(req, res) {
