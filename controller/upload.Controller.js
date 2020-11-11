@@ -1,6 +1,6 @@
 const formidable = require('formidable');
 const fs = require('fs');
-const creatNFT = require('./creatNFT');
+// const creatNFT = require('./creatNFT');
 const db = require('../database/db');
 const cn = db.createConnection();
 const DOMAIN = process.env.FIRA_DB_PSW || 'localhost:4000';
@@ -13,23 +13,37 @@ async function uploadImg(req, res) {
     const object = await new Promise(tv => {
         form.parse(req, function (err, fields, file) {
             //path tmp trên server
-            var path = file[''].path;
-            //thiết lập path mới cho file
-            var newpath = form.uploadDir + file[''].name;
-            var nameNft = file[''].name.split('.')[0];
+            var path = file.myFile.path;
+            if (file.myFile.name.split('.')[1] !== 'png') {
+                try {
+                    fs.unlinkSync(path)
+                    res.status().send({
+                        message:"Hiện tại hệ thống chỉ hỗ hệ ảnh file .PNG, ảnh bạn đang dùng là định dạng ."+file.myFile.name.split('.')[1]
+                    })
+                } catch (err) {
+                    return res.status(404).send({
+                        message: "Err",
+                        err
+                    })
+                }
+            } else {
+                //thiết lập path mới cho file
+                var newpath = form.uploadDir + file.myFile.name;
+                var nameNft = file.myFile.name.split('.')[0];
 
-            fs.rename(path, newpath, function (err) {
-                if (err) return res.send({
-                    message:err
+                fs.rename(path, newpath, function (err) {
+                    if (err) return res.send({
+                        message: err
+                    });
                 });
-            });
-            creatNFT(newpath);
-            var object = {
-                n_image: file[''].name,
-                l_image: `${DOMAIN}/image/${file[''].name}`,
-                l_nft: `${DOMAIN}/nft/${nameNft}`
-            };
-            tv(object);
+                // creatNFT(newpath);
+                var object = {
+                    n_image: file.myFile.name,
+                    l_image: `${DOMAIN}/image/${file.myFile.name}`,
+                    l_nft: `${DOMAIN}/nft/${nameNft}`
+                };
+                tv(object);
+            }
         });
     })
     res.send({
@@ -48,31 +62,36 @@ async function uploadVideo(req, res) {
     var form = new formidable.IncomingForm();
     form.uploadDir = "./upload/videos/";
     //xử lý upload
-    const object = await new Promise(tv=>{
+    const object = await new Promise(tv => {
         form.parse(req, function (err, fields, file) {
             // path tmp trên server
-            var path = file.files.path;
+            var path = file[''].path;
             //thiết lập path mới cho file
-            var newpath = form.uploadDir + file.files.name;
+            var newpath = form.uploadDir + file[''].name;
             fs.rename(path, newpath, function (err) {
                 if (err) return res.send({
-                    message:err
+                    message: err
                 });
             });
             var object = {
-                n_video: file.files.name,
-                l_video: `${DOMAIN}/getcontent/video/${file.files.name}`
+                n_video: file[''].name,
+                l_video: `${DOMAIN}/video/${file[''].name}`
             };
             tv(object);
         });
     });
-    const sql = `INSERT INTO videos (id, n_video, l_video) VALUES (NULL, '${object.n_video}', '${object.l_video}')`;
-    cn.query(sql, (err)=>{
-        if(err) return res.status(400).send(err);
-        res.status(200).send({
-            message:"Data saving is complete"
-        })
-    })
+
+    res.send({
+        object
+    });
+
+    // const sql = `INSERT INTO videos (id, n_video, l_video) VALUES (NULL, '${object.n_video}', '${object.l_video}')`;
+    // cn.query(sql, (err)=>{
+    //     if(err) return res.status(400).send(err);
+    //     res.status(200).send({
+    //         message:"Data saving is complete"
+    //     })
+    // })
 }
 
 module.exports = {
