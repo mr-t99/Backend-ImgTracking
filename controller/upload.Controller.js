@@ -1,6 +1,6 @@
 const formidable = require('formidable');
 const fs = require('fs');
-// const creatNFT = require('./creatNFT');
+const creatNFT = require('./creatNFT');
 const db = require('../database/db');
 const cn = db.createConnection();
 const DOMAIN = process.env.FIRA_DB_PSW || 'localhost:4000';
@@ -13,18 +13,19 @@ async function uploadImg(req, res) {
     const object = await new Promise(tv => {
         form.parse(req, function (err, fields, file) {
             //path tmp trên server
+            var object;
             var path = file.myFile.path;
             if (file.myFile.name.split('.')[1] !== 'png') {
                 try {
                     fs.unlinkSync(path)
-                    res.status().send({
-                        message:"Hiện tại hệ thống chỉ hỗ hệ ảnh file .PNG, ảnh bạn đang dùng là định dạng ."+file.myFile.name.split('.')[1]
-                    })
+                    object = {
+                        message: "Hiện tại hệ thống chỉ hỗ hệ ảnh file .PNG, ảnh bạn đang dùng là định dạng ." + file.myFile.name.split('.')[1]
+                    }
                 } catch (err) {
-                    return res.status(404).send({
+                    object = {
                         message: "Err",
                         err
-                    })
+                    }
                 }
             } else {
                 //thiết lập path mới cho file
@@ -36,14 +37,17 @@ async function uploadImg(req, res) {
                         message: err
                     });
                 });
-                // creatNFT(newpath);
-                var object = {
-                    n_image: file.myFile.name,
-                    l_image: `${DOMAIN}/image/${file.myFile.name}`,
-                    l_nft: `${DOMAIN}/nft/${nameNft}`
+                creatNFT(newpath);
+                object = {
+                    message: "Bạn đã hoàn thành thiết lập",
+                    info: {
+                        n_image: file.myFile.name,
+                        l_image: `${DOMAIN}/image/${file.myFile.name}`,
+                        l_nft: `${DOMAIN}/nft/${nameNft}`
+                    }
                 };
-                tv(object);
             }
+            tv(object);
         });
     })
     res.send({
