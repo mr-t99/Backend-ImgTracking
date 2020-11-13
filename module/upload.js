@@ -10,4 +10,8 @@ router.post('/video', (req, res)=>{
     uploadController.uploadVideo(req, res);
 })
 
+router.post('/creategroup', (req, res)=>{
+    uploadController.createGroup(req, res);
+})
+
 module.exports = router;

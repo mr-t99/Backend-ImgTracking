@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 var cors = require('cors');
+var bodyParser = require('body-parser');
 
 const upload = require('./module/upload');
 const getcontent = require('./module/getcontent');
@@ -8,6 +9,8 @@ const getcontent = require('./module/getcontent');
 const port = process.env.PORT||4000;
 app.use(cors());
 
+app.use(express.json());
+app.use(bodyParser.json());
 app.use( ('/image'), express.static('./upload/image'))
 app.use( ('/video'), express.static('./upload/videos'))
 app.use( ('/nft'), express.static('./upload/nftfile'))

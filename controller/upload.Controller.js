@@ -11,7 +11,7 @@ async function uploadImg(req, res) {
     form.uploadDir = "./upload/image/";
     //xử lý upload
     const object = await new Promise(tv => {
-        form.parse(req, function (err, fields, file) {
+        form.parse(req,async function (err, fields, file) {
             //path tmp trên server
             var object;
             var path = file.myFile.path;
@@ -19,12 +19,14 @@ async function uploadImg(req, res) {
                 try {
                     fs.unlinkSync(path)
                     object = {
-                        message: "Hiện tại hệ thống chỉ hỗ hệ ảnh file .PNG, ảnh bạn đang dùng là định dạng ." + file.myFile.name.split('.')[1]
+                        message: "Hiện tại hệ thống chỉ hỗ hệ ảnh file .PNG, ảnh bạn đang dùng là định dạng ." + file.myFile.name.split('.')[1],
+                        status: 400
                     }
                 } catch (err) {
                     object = {
                         message: "Err",
-                        err
+                        err,
+                        status: 400
                     }
                 }
             } else {
@@ -38,14 +40,24 @@ async function uploadImg(req, res) {
                     });
                 });
                 creatNFT(newpath);
-                object = {
-                    message: "Bạn đã hoàn thành thiết lập",
-                    info: {
-                        n_image: file.myFile.name,
-                        l_image: `${DOMAIN}/image/${file.myFile.name}`,
-                        l_nft: `${DOMAIN}/nft/${nameNft}`
-                    }
-                };
+                const sql = `INSERT INTO images (id, name, link_img, link_nft, id_group) VALUES (NULL, '${file.myFile.name}', '${DOMAIN}/image/${file.myFile.name}', '${DOMAIN}/nft/${nameNft}', ${fields.idGroup})`;
+                object = await new Promise(tv => {
+                    cn.query(sql, (err, result) => {
+                        if (err) return res.status(400).send(err);
+                        object = {
+                            message: "Bạn đã hoàn thành thiết lập",
+                            info: {
+                                n_image: file.myFile.name,
+                                l_image: `${DOMAIN}/image/${file.myFile.name}`,
+                                l_nft: `${DOMAIN}/nft/${nameNft}`,
+                                idGroup: fields.idGroup,
+                                idImage: result.insertId
+                            },
+                            status: 200
+                        };
+                        tv(object);
+                    })
+                })
             }
             tv(object);
         });
@@ -53,13 +65,6 @@ async function uploadImg(req, res) {
     res.send({
         object
     });
-    // const sql = `INSERT INTO image (id, n_image, l_image, l_nft) VALUES (NULL, '${object.n_image}', '${object.l_image}', '${object.l_nft}')`;
-    // cn.query(sql, (err)=>{
-    //     if(err) return res.status(400).send(err);
-    //     res.status(200).send({
-    //         message:"Data saving is complete"
-    //     })
-    // })
 }
 
 async function uploadVideo(req, res) {
@@ -67,20 +72,28 @@ async function uploadVideo(req, res) {
     form.uploadDir = "./upload/videos/";
     //xử lý upload
     const object = await new Promise(tv => {
-        form.parse(req, function (err, fields, file) {
+        form.parse(req,async function (err, fields, file) {
             // path tmp trên server
-            var path = file[''].path;
+            var path = file.myFile.path;
             //thiết lập path mới cho file
-            var newpath = form.uploadDir + file[''].name;
+            var newpath = form.uploadDir + file.myFile.name;
             fs.rename(path, newpath, function (err) {
                 if (err) return res.send({
                     message: err
                 });
             });
-            var object = {
-                n_video: file[''].name,
-                l_video: `${DOMAIN}/video/${file[''].name}`
-            };
+            console.log(file);
+            var sql = `INSERT INTO contens (id, name, link, id_img, type) VALUES (NULL, '${file.myFile.name}', '${DOMAIN}/video/${file.myFile.name}', '${fields.idImage}', '${file.myFile.type}')`
+            var object = await new Promise(tv => {
+                cn.query(sql, (err) => {
+                    if (err) return res.status(400).send(err);
+                    object = {
+                        message: "Bạn đã hoàn thành thiết lập",
+                        status: 200
+                    };
+                    tv(object);
+                })
+            })
             tv(object);
         });
     });
@@ -88,17 +101,22 @@ async function uploadVideo(req, res) {
     res.send({
         object
     });
+}
 
-    // const sql = `INSERT INTO videos (id, n_video, l_video) VALUES (NULL, '${object.n_video}', '${object.l_video}')`;
-    // cn.query(sql, (err)=>{
-    //     if(err) return res.status(400).send(err);
-    //     res.status(200).send({
-    //         message:"Data saving is complete"
-    //     })
-    // })
+function createGroup(req, res) {
+    const { name } = req.body;
+    var sql = `INSERT INTO groups (name) VALUES ('${name}')`;
+    cn.query(sql, (err, result) => {
+        if (err) return res.status(400).send(err);
+        res.status(200).send({
+            message: "Tạo thành công group: " + name,
+            id_group: result.insertId
+        })
+    })
 }
 
 module.exports = {
     uploadImg,
-    uploadVideo
+    uploadVideo,
+    createGroup
 }
