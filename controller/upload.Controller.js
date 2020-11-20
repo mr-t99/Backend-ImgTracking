@@ -82,8 +82,7 @@ async function uploadVideo(req, res) {
                     message: err
                 });
             });
-            console.log(file);
-            var sql = `INSERT INTO contens (id, name, link, id_img, type) VALUES (NULL, '${file.myFile.name}', '${DOMAIN}/video/${file.myFile.name}', '${fields.idImage}', '${file.myFile.type}')`
+            var sql = `INSERT INTO contens (id, name, link_conten, id_img, type) VALUES (NULL, '${file.myFile.name}', '${DOMAIN}/video/${file.myFile.name}', '${fields.idGroup}', '${file.myFile.type}')`
             var object = await new Promise(tv => {
                 cn.query(sql, (err) => {
                     if (err) return res.status(400).send(err);

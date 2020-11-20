@@ -6,4 +6,7 @@ router.get('/group', (req, res)=>{
     getcontent.getGroupDatabase(req, res);
 })
 
+router.get('/arconten/:idgroup',(req, res)=>{
+    getcontent.getDataAr(req, res);
+});
 module.exports = router;

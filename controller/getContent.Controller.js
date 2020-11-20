@@ -17,6 +17,16 @@ function getGroupDatabase(req, res){
     })
 }
 
+function getDataAr(req, res){
+    const {idgroup} = req.params;
+    const sql = `SELECT * FROM groups,images,contens WHERE groups.id=images.id_group AND images.id = contens.id AND groups.id = ${idgroup};`
+    cn.query(sql, (err, rl)=>{
+        if(err) return res.status(400).send(err);
+        res.send(rl)
+    });
+}
+
 module.exports = {
-    getGroupDatabase
+    getGroupDatabase,
+    getDataAr
 }
